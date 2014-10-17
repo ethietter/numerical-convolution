@@ -1,23 +1,23 @@
 #include "UserFunction.h"
 #include <string>
+#include <iostream>
 
-UserFunction::UserFunction(std::string input){
-    this.setString(input);
+UserFunction::UserFunction(std::string input) :input_string(input) {
 }
 
-void UserFunction::UserFunction(){
+UserFunction::UserFunction(){
 
 }
 
 void UserFunction::process(){
-    std::cout << "Process: " << this.input_string << endl;
+    std::cout << "Process: " << this->input_string << std::endl;
 }
 
 void UserFunction::setString(std::string input){
-    this.input_string = input;
+    this->input_string = input;
 }
 
 std::string UserFunction::getString(){
-    return this.input_string;
+    return this->input_string;
 }
 
