@@ -10,11 +10,28 @@ UserFunction::UserFunction(std::string input) :input_string(input) {
 }
 
 void UserFunction::tokenize(){
-
+    std::vector<std::string> possible_tokens(valid_tokens.begin(), valid_tokens.end());
+    std::string partial_token = "";
+    for(unsigned int i = 0; i < this->input_string.length(); i++){
+        for(unsigned int j = 0; j < possible_tokens.size(); j++){
+            if(input_string[i] == possible_tokens[j][partial_token.length()]){
+                partial_token += input_string[i];
+                if(partial_token == possible_tokens[j]){
+                    Token new_token(partial_token);
+                    this->token_list.push_back(new_token);
+                    partial_token = "";
+                }
+            }
+        }
+    }
+    for(unsigned int i = 0; i < this->token_list.size(); i++){
+        std::cout << i << std::endl;
+        //std::cout << *it << std::endl;
+    }
 }
 
 void UserFunction::process(){
-    std::cout << "Process: " << this->input_string << std::endl;
+    this->tokenize();
 }
 
 void UserFunction::setString(std::string input){
