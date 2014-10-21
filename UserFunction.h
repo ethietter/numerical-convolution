@@ -12,6 +12,7 @@ class UserFunction{
         std::vector<std::string> valid_tokens;
         std::vector<Token> token_list;
         void tokenize();
+        std::vector<std::string> lookup(std::string curr_word, std::vector<std::string> possible_tokens);
 
     public:
         UserFunction(std::string input);
