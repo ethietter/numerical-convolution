@@ -11,9 +11,10 @@ int main(int argc, char* argv[]){
     UserFunction fn1 = UserFunction(fn1_input);
     fn1.process();
     
+	/*
     cout << "Input second function:" <<endl;
     cin >> fn2_input;
     UserFunction fn2 = UserFunction(fn2_input);
     fn2.process();
-
+	*/
 }
