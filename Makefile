@@ -1,15 +1,15 @@
-CXX = g++ -Wall -Werror
+CXX = g++ -Wall -Werror -std=c++0x
 BIN = ../bin
 DIR = ~/lib/boost_1_56_0
 
-compile: main.o UserFunction.o Token.o
-	$(CXX) -I $(DIR) $(BIN)/main.o $(BIN)/UserFunction.o $(BIN)/Token.o -o $(BIN)/convolution.exe
+compile: main.o Token.o
+	$(CXX) -I $(DIR) $(BIN)/main.o $(BIN)/Token.o -o $(BIN)/convolution.exe
 
 test: 
 	make compile	
 	$(BIN)/convolution.exe
 
-main.o: main.cpp UserFunction.h
+main.o: main.cpp
 	$(CXX) -I $(DIR) -c main.cpp -o $(BIN)/main.o
 
 UserFunction.o: UserFunction.cpp UserFunction.h
