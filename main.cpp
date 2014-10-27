@@ -30,6 +30,7 @@ std::vector<char> shuntingYard(std::string token_str){
 
 /* Tokenizes a string that doesn't contain functions */
 std::vector<Token> tokenize(std::string input){
+	//Works perfectly except for recognizing leading decimals (i.e. "0.5" works, but ".5" does not)
 	unsigned int index = 0;
 	unsigned int input_size = input.size();
 	
@@ -37,30 +38,42 @@ std::vector<Token> tokenize(std::string input){
 	
 	Token token;
 	
-	while(index < input_size){
+	for( ;index < input_size; index++){
 		std::string token_str = token.getStr();
 		if(token_str.empty()){
 			token.setStr(input[index]);
 		}
 		else{
-			//If it's of type number, look at the char to append. It has to be a number or a decimal, otherwise don't append
-			token.appendStr(input[index]);
+			if(token.appendStr(input[index])){
+				continue;
+			}
+			else{
+				tokens.push_back(Token(token.getStr()));
+				token.reset();
+				token.setStr(input[index]);
+				if(!token.isPartial()){
+					tokens.push_back(Token(token.getStr()));
+					token.reset();
+				}
+			}
 		}
-		std::cout << token.getStr() << std::endl;
-		index++;
-		/*
-		if(curr_token_str.isPartial()){
-			curr_token_str .
-		}
-		*/
+	}
+	
+	if(!token.getStr().empty()){
+		tokens.push_back(Token(token.getStr()));
 	}
 	
 	return tokens;
 }
 
 int main(int argc, char* argv[]){
-	std::string input = "5*3.2";
-	tokenize(input);
+	std::string input;
+	std::cin >> input;
+	std::vector<Token> token_list = tokenize(input);
+	std::cout << " -------------" << std::endl;
+	for(unsigned int i = 0; i < token_list.size(); i++){
+		std::cout << token_list[i].getStr() << std::endl;
+	}
     /*
 	string fn1_input, fn2_input;
 

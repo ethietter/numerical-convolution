@@ -11,7 +11,7 @@ class Token{
 		int token_type;
 		bool is_partial;
 		void setType();
-		void getFloatVal();
+		bool isFloat(std::string str);
 
     public:
         Token(std::string str);
@@ -19,10 +19,11 @@ class Token{
         std::string getStr();
 		bool isPartial();
 		void setComplete();
-		void appendStr(std::string str);
-		void appendStr(char c);
+		bool appendStr(std::string str);
+		bool appendStr(char c);
 		void setStr(std::string str);
 		void setStr(char c);
+		void reset();
 		int getType();
 
 };

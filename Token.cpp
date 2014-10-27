@@ -8,16 +8,19 @@
 enum token_ids{
 	ID_OPERATOR,
 	ID_NUMBER,
-	ID_VAR
+	ID_VAR,
+	ID_UNDEFINED
 };
 
 Token::Token(std::string str) : token_string(str) {
 	is_partial = true;
+	token_type = ID_UNDEFINED;
 	setType();
 }
 
 Token::Token(){
-	is_partial = true;	
+	is_partial = true;
+	token_type = ID_UNDEFINED;
 }
 
 void Token::setType(){
@@ -36,20 +39,24 @@ void Token::setType(){
 			}
 		}
 		//If it gets here, it's neither an operator nor a variable
-		getFloatVal();
+		if(isFloat(token_string)){
+			token_type = ID_NUMBER;
+		}
 	}
 	else if(token_string.size() > 1){
-		getFloatVal();
+		if(isFloat(token_string)){
+			token_type = ID_NUMBER;
+		}
 	}
 }
 
-void getFloatVal(){
+bool Token::isFloat(std::string str){
 	try {
-		float_val = boost::lexical_cast<float>(token_string);
-		token_type = ID_NUMBER;
+		boost::lexical_cast<float>(str);
+		return true;
 	}
 	catch(boost::bad_lexical_cast){
-		std::cout << "Invalid token" << std::endl;
+		return false;
 	}
 }
 
@@ -65,18 +72,45 @@ void Token::setComplete(){
 	is_partial = false;
 }
 
-void Token::appendStr(std::string str){
-	if(is_partial){
+bool Token::appendStr(std::string str){
+	/*if(is_partial){
 		token_string += str;
+		setType();
 	}
-	setType();
+	*/
+	if(is_partial){
+		if(token_type == ID_NUMBER){
+			//Does adding the char to this make it a number? If so, add the char to the token string and return true
+			if(isFloat(token_string + str)){
+				token_string += str;
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
+		token_string += str;
+		setType();
+	}
+	return false;
 }
 
-void Token::appendStr(char c){
+bool Token::appendStr(char c){
 	if(is_partial){
+		if(token_type == ID_NUMBER){
+			//Does adding the char to this make it a number? If so, add the char to the token string and return true
+			if(isFloat(token_string + c)){
+				token_string += c;
+				return true;
+			}
+			else{
+				return false;
+			}
+		}
 		token_string += c;
+		setType();
 	}
-	setType();
+	return false;
 }
 
 void Token::setStr(std::string str){
@@ -86,9 +120,16 @@ void Token::setStr(std::string str){
 
 void Token::setStr(char c){
 	token_string = c;
+	//std::cout << token_string << " <-- In setStr() " << std::endl;
 	setType();
 }
 
 std::string Token::getStr(){
     return token_string;
+}
+
+void Token::reset(){
+	token_string = "";
+	token_type = ID_UNDEFINED;
+	is_partial = true;
 }
