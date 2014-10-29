@@ -1,125 +1,136 @@
 #include "UserFunction.h"
-
-#include "boost/config/warning_disable.hpp"
-#include "boost/spirit/include/lex_lexertl.hpp"
-#include "boost/bind.hpp"
-#include "boost/ref.hpp"
+#include "Token.h"
 
 #include <string>
-#include <iostream>
-#include <algorithm>
+#include <vector>
 #include <stack>
-
-namespace lex = boost::spirit::lex;
-
-enum token_ids{
-	ID_FUNC = 1000,
-	ID_OPERATOR,
-	ID_NUMBER,
-	ID_VAR
-};
-
-template <typename Lexer>
-struct function_tokens : lex::lexer<Lexer> {
-	function_tokens(){
-		// define tokens (the regular expression to match and the corresponding token id) and add them to the lexer
-		this->self.add
-			("[a-zA-Z]+\\[[^a-zA-Z]]*\\]", ID_FUNC)
-			("([0-9]+(\\.)?[0-9]+)|([0-9]+)|((\\.)?[0-9]+)", ID_NUMBER)
-			("[\\+\\-\\*/\\^]", ID_OPERATOR)
-			("t", ID_VAR)
-        ;
-    }
-};
-
-struct counter {
-	typedef bool result_type;
-	
-	template <typename Token>
-	bool operator()(Token const& t) const {
-		std::cout << "call" << std::endl;
-		std::cout << t.value() << std::endl;
-		/*switch(t.id(){
-			case ID_WORD
-			break;
-		}*/
-		return true;
-	}
-};
+#include <iostream>
 
 
-UserFunction::UserFunction(std::string input) :input_string(input) {
-    /*std::string valid_tokens_list[] = {"(", ")", "+", "-", "/", "*", "^", "t", "log", "ln", "pi", "e", "cos", "sin", "tan"};
-    for(unsigned int i = 0; i < sizeof(valid_tokens_list) / sizeof(valid_tokens_list[0]); i++){
-        this->valid_tokens.push_back(valid_tokens_list[i]);
-    }*/
+UserFunction::UserFunction(std::string input) : input_string(input){
+
 }
 
-bool UserFunction::process(std::string input){
-	bool is_valid = this->tokenize(input);
-	/*
-	std::stack<char> input_stack;
-	for(unsigned int i = 0; i < input.length(); i++){
-		if(input[i] != ')'){
-			input_stack.push(input[i]);
+UserFunction::UserFunction(){
+
+}
+
+std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
+	std::stack<Token> operator_stack;
+	std::vector<Token> output;
+	unsigned int index = 0;
+	unsigned int num_tokens = tokens.size();
+	
+	
+	while(index < num_tokens){
+		Token curr_token = tokens[index];
+		if(curr_token.isNumber()){
+			output.push_back(curr_token);
+		}
+		else if(curr_token.isOperator()){
+			if(!operator_stack.empty()){
+				while(operator_stack.top().isOperator()
+						&& 
+						( (curr_token.isLeftAssoc() && curr_token.getPrecedence() <= operator_stack.top().getPrecedence())
+						  ||
+						  (curr_token.getPrecedence() < operator_stack.top().getPrecedence()) )
+					  )
+				{
+					output.push_back(operator_stack.top());
+					operator_stack.pop();
+				}
+			}
+			operator_stack.push(curr_token);
+		}
+		else if(curr_token.getStr() == "("){
+			operator_stack.push(curr_token);
+		}
+		else if(curr_token.getStr() == ")"){
+			while(operator_stack.top().getStr() != "("){
+				output.push_back(operator_stack.top());
+				operator_stack.pop();
+				if(operator_stack.empty()){
+					//error, mismatched parentheses
+					break;
+				}
+			}
+			if(operator_stack.top().getStr() == "("){
+				operator_stack.pop();
+			}
+		}
+		index++;
+	}
+	while(!operator_stack.empty()){
+		if(operator_stack.top().getStr() == "(" || operator_stack.top().getStr() == ")"){
+			//error, mismatched parentheses
+			break;
 		}
 		else{
-			std::string curr_expression;
-			char curr_char;
-			while(!input_stack.empty() && ((curr_char = input_stack.top()) != '(')){
-				curr_expression += curr_char;
-				input_stack.pop();
-			}
-			if(!input_stack.empty() && input_stack.top() == '(') input_stack.pop();
-			//Reverse the string
-			unsigned int expr_len = curr_expression.length();
-			for(unsigned int j = 0; j < ceil(expr_len/2.0); j++){
-				char tmp = curr_expression[j];
-				curr_expression[j] = curr_expression[expr_len - 1 - j];
-				curr_expression[expr_len - 1 - j] = tmp;
-			}
-			this->tokenize(curr_expression);
-			//std::reverse(&curr_expression, &curr_expression + curr_expression.length());
-			//std::cout << curr_expression << std::endl;
+			output.push_back(operator_stack.top());
+			operator_stack.pop();
 		}
 	}
-    bool is_valid = this->tokenize(input);
-	*/
-	return is_valid;
-	//return is_valid;
+	return output;
+	
 }
 
-bool UserFunction::tokenize(std::string expression){
-	function_tokens<lex::lexertl::lexer<> > tokenizer_functor;
+/* Tokenizes a string that doesn't contain functions */
+std::vector<Token> UserFunction::tokenize(std::string input){
+	//Works perfectly except for recognizing leading decimals (i.e. "0.5" works, but ".5" does not)
+	unsigned int index = 0;
+	unsigned int input_size = input.size();
 	
-	char const* first = expression.c_str();
-	char const* last = &first[expression.size()];
-	return lex::tokenize(first, last, tokenizer_functor, counter());//boost::bind(counter(), _1));
+	std::vector<Token> tokens;
 	
+	Token token;
+	
+	for( ;index < input_size; index++){
+		std::string token_str = token.getStr();
+		if(token_str.empty()){
+			token.setStr(input[index]);
+		}
+		else{
+			if(token.appendStr(input[index])){
+				continue;
+			}
+			else{
+				tokens.push_back(Token(token.getStr()));
+				token.reset();
+				token.setStr(input[index]);
+				if(!token.isPartial()){
+					tokens.push_back(Token(token.getStr()));
+					token.reset();
+				}
+			}
+		}
+	}
+	
+	if(!token.getStr().empty()){
+		tokens.push_back(Token(token.getStr()));
+	}
+	
+	return tokens;
 }
 
 bool UserFunction::process(){
-	return this->process(this->input_string);
-	/*if(is_valid){
-		std::cout << "Analysis successful" << std::endl;
+	std::vector<Token> tokens = tokenize(input_string);
+	std::vector<Token> s_yard = shuntingYard(tokens);
+	for(unsigned int i = 0; i < s_yard.size(); i++){
+		std::cout << s_yard[i].getStr() << std::endl;
 	}
-	else{
-		std::string rest(first, last);
-		std::cout << "Analysis failed\n Stopped at: \"" << rest << "\"\n" << std::endl;
-	}*/
+	return true;
 }
 
+bool UserFunction::process(std::string input){
+	std::vector<Token> tokens = tokenize(input);
+	std::vector<Token> s_yard = shuntingYard(tokens);
+	return true;
+}
 
 void UserFunction::setString(std::string input){
-    this->input_string = input;
+	input_string = input;
 }
 
 std::string UserFunction::getString(){
-    return this->input_string;
-}
-
-void UserFunction::printVec(std::vector<std::string> vec){
-    for(std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it){
-        std::cout << *it << std::endl;
-    }
+	return input_string;
 }

@@ -11,9 +11,9 @@ class UserFunction{
         std::string input_string;
         std::vector<std::string> valid_tokens;
         std::vector<Token> token_list;
-        bool tokenize(std::string expression);
-        std::vector<std::string> lookup(std::string curr_word, std::vector<std::string> possible_tokens);
-        void printVec(std::vector<std::string> vec);
+        std::vector<Token> tokenize(std::string input);
+		std::vector<Token> shuntingYard(std::vector<Token> tokens);
+		
 
     public:
         UserFunction(std::string input);

@@ -9,6 +9,7 @@ enum token_ids{
 	ID_OPERATOR,
 	ID_NUMBER,
 	ID_VAR,
+	ID_PAREN,
 	ID_UNDEFINED
 };
 
@@ -31,15 +32,32 @@ void Token::setType(){
 			token_type = ID_VAR;
 			return;
 		}
+		if(token_string[0] == '(' || token_string[0] == ')'){
+			is_partial = false;
+			token_type = ID_PAREN;
+			return;
+		}
 		for(unsigned int i = 0; i < sizeof(operators)/sizeof(operators[0]); i++){
 			if(token_string[0] == operators[i]){
 				is_partial = false;
 				token_type = ID_OPERATOR;
+				if(operators[i] == '+' || operators[i] == '-'){
+					precedence = '0';
+					is_left_assoc = true;
+				}
+				if(operators[i] == '*' || operators[i] == '/'){
+					precedence = '1';
+					is_left_assoc = true;
+				}
+				if(operators[i] == '^'){
+					precedence = '2';
+					is_left_assoc = false;
+				}
 				return;
 			}
 		}
 		//If it gets here, it's neither an operator nor a variable
-		if(isFloat(token_string)){
+		if(isFloat(token_string) || token_string[0] == '.'){
 			token_type = ID_NUMBER;
 		}
 	}
@@ -48,6 +66,14 @@ void Token::setType(){
 			token_type = ID_NUMBER;
 		}
 	}
+}
+
+bool Token::isLeftAssoc(){
+	return is_left_assoc;
+}
+
+unsigned int Token::getPrecedence(){
+	return precedence;
 }
 
 bool Token::isFloat(std::string str){
@@ -72,27 +98,16 @@ void Token::setComplete(){
 	is_partial = false;
 }
 
-bool Token::appendStr(std::string str){
-	/*if(is_partial){
-		token_string += str;
-		setType();
-	}
-	*/
-	if(is_partial){
-		if(token_type == ID_NUMBER){
-			//Does adding the char to this make it a number? If so, add the char to the token string and return true
-			if(isFloat(token_string + str)){
-				token_string += str;
-				return true;
-			}
-			else{
-				return false;
-			}
-		}
-		token_string += str;
-		setType();
-	}
-	return false;
+bool Token::isOperator(){
+	return (token_type == ID_OPERATOR);
+}
+
+bool Token::isNumber(){
+	return (token_type == ID_NUMBER);
+}
+
+bool Token::isVar(){
+	return (token_type == ID_VAR);
 }
 
 bool Token::appendStr(char c){
@@ -111,11 +126,6 @@ bool Token::appendStr(char c){
 		setType();
 	}
 	return false;
-}
-
-void Token::setStr(std::string str){
-	token_string = str;
-	setType();
 }
 
 void Token::setStr(char c){
