@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include "Token.h"
 
 class UserFunction{
@@ -13,6 +14,8 @@ class UserFunction{
         std::vector<Token> token_list;
         std::vector<Token> tokenize(std::string input);
 		std::vector<Token> shuntingYard(std::vector<Token> tokens);
+		std::vector<std::string> valid_functions;
+		void init();
 		
 
     public:

@@ -8,11 +8,22 @@
 
 
 UserFunction::UserFunction(std::string input) : input_string(input){
-
+	init();
 }
 
 UserFunction::UserFunction(){
+	init();
+}
 
+void UserFunction::init(){
+	//Order is important here. Inverse trig function must come before the trig function itself.
+	valid_functions.push_back("acos");
+	valid_functions.push_back("asin");
+	valid_functions.push_back("atan");
+	valid_functions.push_back("cos");
+	valid_functions.push_back("sin");
+	valid_functions.push_back("tan");
+	valid_functions.push_back("ln");
 }
 
 std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
@@ -74,16 +85,25 @@ std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
 	
 }
 
-/* Tokenizes a string that doesn't contain functions */
 std::vector<Token> UserFunction::tokenize(std::string input){
-	//Works perfectly except for recognizing leading decimals (i.e. "0.5" works, but ".5" does not)
 	unsigned int index = 0;
-	unsigned int input_size = input.size();
 	
 	std::vector<Token> tokens;
+	std::vector<std::string> functions;
 	
 	Token token;
 	
+	//Find the functions in input string
+	for(unsigned int i = 0; i < valid_functions.size(); i++){
+		unsigned int pos = input.find(valid_functions[i], 0);
+		while(pos != std::string::npos){
+			input.replace(pos, valid_functions[i].size(), "@");
+			functions.push_back(valid_functions[i]);
+			pos = input.find(valid_functions[i], pos + 1);
+		}
+	}
+	
+	unsigned int input_size = input.size();
 	for( ;index < input_size; index++){
 		std::string token_str = token.getStr();
 		if(token_str.empty()){
@@ -114,9 +134,9 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 
 bool UserFunction::process(){
 	std::vector<Token> tokens = tokenize(input_string);
-	std::vector<Token> s_yard = shuntingYard(tokens);
-	for(unsigned int i = 0; i < s_yard.size(); i++){
-		std::cout << s_yard[i].getStr() << std::endl;
+	//std::vector<Token> s_yard = shuntingYard(tokens);
+	for(unsigned int i = 0; i < tokens.size(); i++){
+		std::cout << tokens[i].getStr() << std::endl;
 	}
 	return true;
 }

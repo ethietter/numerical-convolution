@@ -10,6 +10,7 @@ enum token_ids{
 	ID_NUMBER,
 	ID_VAR,
 	ID_PAREN,
+	ID_FUNCTION,
 	ID_UNDEFINED
 };
 
@@ -30,6 +31,11 @@ void Token::setType(){
 		if(token_string[0] == 't'){
 			is_partial = false;
 			token_type = ID_VAR;
+			return;
+		}
+		if(token_string[0] == '@'){
+			is_partial = false;
+			token_type = ID_FUNCTION;
 			return;
 		}
 		if(token_string[0] == '(' || token_string[0] == ')'){
