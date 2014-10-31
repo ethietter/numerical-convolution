@@ -1,6 +1,7 @@
 #include "UserFunction.h"
 #include "Token.h"
 
+#include <math.h>
 #include <string>
 #include <vector>
 #include <stack>
@@ -25,9 +26,6 @@ void UserFunction::init(){
 	valid_functions.push_back("sin");
 	valid_functions.push_back("tan");
 	valid_functions.push_back("ln");
-	
-	//input_string.erase(std::remove(input_string.begin(), input_string.end(), ' '), input_string.end());
-	std::cout << input_string << std::endl;
 }
 
 std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
@@ -159,9 +157,6 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 bool UserFunction::process(){
 	std::vector<Token> tokens = tokenize(input_string);
 	s_yard = shuntingYard(tokens);
-	for(unsigned int i = 0; i < s_yard.size(); i++){
-		std::cout << s_yard[i].getStr() << std::endl;
-	}
 	return true;
 }
 
@@ -173,18 +168,61 @@ std::string UserFunction::getString(){
 	return input_string;
 }
 
-float evaluate(float t){
-	bool op_left_set = false;
-	bool op_right_set = false;
-	float op_left;
-	float op_right;
+float UserFunction::evaluate(float t){
+	std::stack<Token> eval_stack;
 	for(unsigned int i = 0; i < s_yard.size(); i++){
-		if(s_yard.isVar()){
-			
+		std::cout << s_yard[i].getStr() << " ";
+		if(s_yard[i].isVar()){
+			Token token;
+			token.setFloat(t);
+			eval_stack.push(token);
+			std::cout << token.getStr();
 		}
-		if(!op_left_set){
-			if(s_yard[i].isNumber()){
-			}
+		else if(s_yard[i].isNumber()){
+			eval_stack.push(s_yard[i]);
+			std::cout << s_yard[i].getStr();
 		}
+		else if(s_yard[i].isOperator()){
+			float op_right = eval_stack.top().getFloatVal();
+			eval_stack.pop();
+			float op_left = eval_stack.top().getFloatVal();
+			eval_stack.pop();
+			eval_stack.push(evalOp(op_left, op_right, s_yard[i]));
+			std::cout << s_yard[i].getStr();
+		}
+		else if(s_yard[i].isFunction()){
+			float op = eval_stack.top().getFloatVal();
+			eval_stack.pop();
+			eval_stack.push(evalFn(op, s_yard[i]));
+			std::cout << s_yard[i].getStr();
+		}
+		std::cout << " " << std::endl;
 	}
+	
+	if(eval_stack.size() != 1){
+		std::cout << "Error in evaluate" << std::endl;
+	}
+	return eval_stack.top().getFloatVal();
+}
+
+Token UserFunction::evalOp(float op_left, float op_right, Token op){
+	Token token;
+	if(op.getStr() == "+") token.setFloat(op_left + op_right);
+	else if(op.getStr() == "-") token.setFloat(op_left - op_right);
+	else if(op.getStr() == "*") token.setFloat(op_left * op_right);
+	else if(op.getStr() == "/") token.setFloat(op_left / op_right);
+	else if(op.getStr() == "^") token.setFloat(pow(op_left, op_right));
+	return token;
+}
+
+Token UserFunction::evalFn(float op, Token fn){
+	Token token;
+	if(fn.getStr() == "cos") token.setFloat(cos(op));
+	else if(fn.getStr() == "sin") token.setFloat(sin(op));
+	else if(fn.getStr() == "tan") token.setFloat(tan(op));
+	else if(fn.getStr() == "acos") token.setFloat(acos(op));
+	else if(fn.getStr() == "asin") token.setFloat(asin(op));
+	else if(fn.getStr() == "atan") token.setFloat(atan(op));
+	else if(fn.getStr() == "ln") token.setFloat(log(op));
+	return token;
 }

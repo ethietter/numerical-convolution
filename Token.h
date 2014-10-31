@@ -10,6 +10,7 @@ class Token{
 		float float_val;
 		int token_type;
 		unsigned int precedence;
+		bool float_val_set = false;
 		bool is_left_assoc;
 		bool is_partial;
 		void setType();
@@ -33,6 +34,8 @@ class Token{
 		bool isNumber();
 		bool isVar();
 		bool isFunction();
+		float getFloatVal();
+		void setFloat(float val);
 
 };
 

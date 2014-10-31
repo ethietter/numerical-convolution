@@ -170,3 +170,29 @@ void Token::reset(){
 	token_type = ID_UNDEFINED;
 	is_partial = true;
 }
+
+float Token::getFloatVal(){
+	if(!is_partial){
+		if(float_val_set){
+			return float_val;
+		}
+		else{
+			try {
+				float_val = boost::lexical_cast<float>(token_string);
+				float_val_set = true;
+				return float_val;
+			}
+			catch(boost::bad_lexical_cast){
+				return 0;
+			}
+		}
+	}
+	return 0;
+}
+
+void Token::setFloat(float val){
+	float_val = val;
+	token_string = boost::lexical_cast<std::string>(float_val);
+	float_val_set = true;
+	setComplete();
+}
