@@ -16,6 +16,7 @@ class Token{
 		bool isFloat(std::string str);
 
     public:
+		Token(std::string str, bool is_function);
         Token(std::string str);
 		Token();
         std::string getStr();
@@ -23,6 +24,7 @@ class Token{
 		void setComplete();
 		bool appendStr(char c);
 		void setStr(char c);
+		void setFunction(std::string str);
 		void reset();
 		int getType();
 		unsigned int getPrecedence();
@@ -30,6 +32,7 @@ class Token{
 		bool isOperator();
 		bool isNumber();
 		bool isVar();
+		bool isFunction();
 
 };
 

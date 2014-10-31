@@ -25,6 +25,17 @@ Token::Token(){
 	token_type = ID_UNDEFINED;
 }
 
+Token::Token(std::string str, bool is_function) : token_string(str){
+	if(is_function){
+		setFunction(str);
+	}
+	else{
+		is_partial = true;
+		token_type = ID_UNDEFINED;
+		setType();
+	}
+}
+
 void Token::setType(){
 	char operators[] = {'+', '-', '*', '/', '^'};
 	if(token_string.size() == 1){
@@ -116,8 +127,13 @@ bool Token::isVar(){
 	return (token_type == ID_VAR);
 }
 
+bool Token::isFunction(){
+	return (token_type == ID_FUNCTION);
+}
+
 bool Token::appendStr(char c){
 	if(is_partial){
+		if(c == '@') return false;//It's a function
 		if(token_type == ID_NUMBER){
 			//Does adding the char to this make it a number? If so, add the char to the token string and return true
 			if(isFloat(token_string + c)){
@@ -138,6 +154,12 @@ void Token::setStr(char c){
 	token_string = c;
 	//std::cout << token_string << " <-- In setStr() " << std::endl;
 	setType();
+}
+
+void Token::setFunction(std::string str){
+	token_string = str;
+	token_type = ID_FUNCTION;
+	is_partial = false;
 }
 
 std::string Token::getStr(){

@@ -35,8 +35,11 @@ std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
 	
 	while(index < num_tokens){
 		Token curr_token = tokens[index];
-		if(curr_token.isNumber()){
+		if(curr_token.isNumber() || curr_token.isVar()){
 			output.push_back(curr_token);
+		}
+		else if(curr_token.isFunction()){
+			operator_stack.push(curr_token);
 		}
 		else if(curr_token.isOperator()){
 			if(!operator_stack.empty()){
@@ -68,6 +71,10 @@ std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
 			if(operator_stack.top().getStr() == "("){
 				operator_stack.pop();
 			}
+			if(operator_stack.top().isFunction()){
+				output.push_back(operator_stack.top());
+				operator_stack.pop();
+			}
 		}
 		index++;
 	}
@@ -94,6 +101,7 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 	Token token;
 	
 	//Find the functions in input string
+	//When a function is found, replace it with '@' and then push the function on to the functions vector
 	for(unsigned int i = 0; i < valid_functions.size(); i++){
 		unsigned int pos = input.find(valid_functions[i], 0);
 		while(pos != std::string::npos){
@@ -104,21 +112,34 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 	}
 	
 	unsigned int input_size = input.size();
+	unsigned int function_index = 0;
 	for( ;index < input_size; index++){
 		std::string token_str = token.getStr();
 		if(token_str.empty()){
-			token.setStr(input[index]);
+			if(input[index] == '@'){
+				token.setFunction(functions[function_index]);
+				function_index++;
+			}
+			else{
+				token.setStr(input[index]);
+			}
 		}
 		else{
 			if(token.appendStr(input[index])){
 				continue;
 			}
 			else{
-				tokens.push_back(Token(token.getStr()));
+				tokens.push_back(Token(token.getStr(), token.isFunction()));
 				token.reset();
-				token.setStr(input[index]);
+				if(input[index] == '@'){
+					token.setFunction(functions[function_index]);
+					function_index++;
+				}
+				else{
+					token.setStr(input[index]);
+				}
 				if(!token.isPartial()){
-					tokens.push_back(Token(token.getStr()));
+					tokens.push_back(Token(token.getStr(), token.isFunction()));
 					token.reset();
 				}
 			}
@@ -134,9 +155,9 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 
 bool UserFunction::process(){
 	std::vector<Token> tokens = tokenize(input_string);
-	//std::vector<Token> s_yard = shuntingYard(tokens);
-	for(unsigned int i = 0; i < tokens.size(); i++){
-		std::cout << tokens[i].getStr() << std::endl;
+	std::vector<Token> s_yard = shuntingYard(tokens);
+	for(unsigned int i = 0; i < s_yard.size(); i++){
+		std::cout << s_yard[i].getStr() << std::endl;
 	}
 	return true;
 }
