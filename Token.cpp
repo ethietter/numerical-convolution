@@ -59,15 +59,15 @@ void Token::setType(){
 				is_partial = false;
 				token_type = ID_OPERATOR;
 				if(operators[i] == '+' || operators[i] == '-'){
-					precedence = '0';
+					precedence = 0;
 					is_left_assoc = true;
 				}
 				if(operators[i] == '*' || operators[i] == '/'){
-					precedence = '1';
+					precedence = 1;
 					is_left_assoc = true;
 				}
 				if(operators[i] == '^'){
-					precedence = '2';
+					precedence = 2;
 					is_left_assoc = false;
 				}
 				return;
@@ -152,7 +152,6 @@ bool Token::appendStr(char c){
 
 void Token::setStr(char c){
 	token_string = c;
-	//std::cout << token_string << " <-- In setStr() " << std::endl;
 	setType();
 }
 

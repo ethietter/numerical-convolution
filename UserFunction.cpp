@@ -5,6 +5,7 @@
 #include <vector>
 #include <stack>
 #include <iostream>
+#include <algorithm>
 
 
 UserFunction::UserFunction(std::string input) : input_string(input){
@@ -24,6 +25,9 @@ void UserFunction::init(){
 	valid_functions.push_back("sin");
 	valid_functions.push_back("tan");
 	valid_functions.push_back("ln");
+	
+	//input_string.erase(std::remove(input_string.begin(), input_string.end(), ' '), input_string.end());
+	std::cout << input_string << std::endl;
 }
 
 std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
@@ -42,17 +46,16 @@ std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
 			operator_stack.push(curr_token);
 		}
 		else if(curr_token.isOperator()){
-			if(!operator_stack.empty()){
-				while(operator_stack.top().isOperator()
-						&& 
-						( (curr_token.isLeftAssoc() && curr_token.getPrecedence() <= operator_stack.top().getPrecedence())
-						  ||
-						  (curr_token.getPrecedence() < operator_stack.top().getPrecedence()) )
-					  )
-				{
-					output.push_back(operator_stack.top());
-					operator_stack.pop();
-				}
+			while(!operator_stack.empty() && 
+				  operator_stack.top().isOperator()
+					&& 
+					( (curr_token.isLeftAssoc() && curr_token.getPrecedence() <= operator_stack.top().getPrecedence())
+					  ||
+					  (curr_token.getPrecedence() < operator_stack.top().getPrecedence()) )
+				  )
+			{
+				output.push_back(operator_stack.top());
+				operator_stack.pop();
 			}
 			operator_stack.push(curr_token);
 		}
@@ -155,16 +158,10 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 
 bool UserFunction::process(){
 	std::vector<Token> tokens = tokenize(input_string);
-	std::vector<Token> s_yard = shuntingYard(tokens);
+	s_yard = shuntingYard(tokens);
 	for(unsigned int i = 0; i < s_yard.size(); i++){
 		std::cout << s_yard[i].getStr() << std::endl;
 	}
-	return true;
-}
-
-bool UserFunction::process(std::string input){
-	std::vector<Token> tokens = tokenize(input);
-	std::vector<Token> s_yard = shuntingYard(tokens);
 	return true;
 }
 
@@ -174,4 +171,20 @@ void UserFunction::setString(std::string input){
 
 std::string UserFunction::getString(){
 	return input_string;
+}
+
+float evaluate(float t){
+	bool op_left_set = false;
+	bool op_right_set = false;
+	float op_left;
+	float op_right;
+	for(unsigned int i = 0; i < s_yard.size(); i++){
+		if(s_yard.isVar()){
+			
+		}
+		if(!op_left_set){
+			if(s_yard[i].isNumber()){
+			}
+		}
+	}
 }

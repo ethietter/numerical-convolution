@@ -11,6 +11,7 @@ class UserFunction{
     private:
         std::string input_string;
         std::vector<std::string> valid_tokens;
+		std::vector<Token> s_yard;
         std::vector<Token> token_list;
         std::vector<Token> tokenize(std::string input);
 		std::vector<Token> shuntingYard(std::vector<Token> tokens);
@@ -22,9 +23,9 @@ class UserFunction{
         UserFunction(std::string input);
         UserFunction();
         bool process();
-		bool process(std::string input);
         void setString(std::string input);
         std::string getString();
+		float evaluate(float t);
 
 };
 
