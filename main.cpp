@@ -6,21 +6,22 @@
 using namespace std;
 
 vector<float> evaluateFunction(UserFunction fn, float x_min, float x_max, int num_points);
+vector<float> convolve(vector<float> fn1_eval, vector<float> fn2_eval, float t_min, float t_max, int num_points);
 
 int main(int argc, char* argv[]){    
 	string fn1_input, fn2_input;
-	float x_min, x_max;
+	float t_min, t_max;
 	
-	cout << "X min: ";
-	while(!(cin >> x_min)){
-		cout << "Please enter a valid float\nX min: ";
+	cout << "T min: ";
+	while(!(cin >> t_min)){
+		cout << "Please enter a valid float\nT min: ";
 		cin.clear();
 		cin.ignore(10000, '\n');
 	}
 	
-	cout << "X max: ";
-	while(!(cin >> x_max)){
-		cout << "Please enter a valid float\nX max: ";
+	cout << "T max: ";
+	while(!(cin >> t_max)){
+		cout << "Please enter a valid float\nT max: ";
 		cin.clear();
 		cin.ignore(10000, '\n');
 	}
@@ -36,29 +37,31 @@ int main(int argc, char* argv[]){
     UserFunction fn2 = UserFunction(fn2_input);
     fn2.process();
 	
-	int num_points = 2;
-	float spacing = (x_max - x_min)/num_points;
-	std::cout << "---" << std::endl;
-	vector<float> fn1_eval = evaluateFunction(fn1, x_min, x_max, num_points);
-	for(unsigned int i = 0; i < fn1_eval.size(); i++){
-		std::cout << "(" << x_min + i*spacing << ", " << fn1_eval[i] << ")" << std::endl;
-	}
-	//vector<float> fn2_eval = evaluateFunction(fn2, x_min, x_max, num_points);
-	
+	int num_points = 20;
+	float spacing = (t_max - t_min)/(num_points - 1);
+	vector<float> fn1_eval = evaluateFunction(fn1, t_min, t_max, num_points);
+    vector<float> fn2_eval = evaluateFunction(fn2, t_min, t_max, num_points);
+	convolve(fn1_eval, fn2_eval, t_min, t_max, spacing);
 }
 
-vector<float> evaluateFunction(UserFunction fn, float x_min, float x_max, int num_points){
+vector<float> evaluateFunction(UserFunction fn, float t_min, float t_max, int num_points){
+    float spacing = (t_max - t_min)/(num_points - 1);
 	vector<float> output;
-	float offset = (x_max - x_min)/num_points;
 	for(int i = 0; i < num_points; i++){
-		float t = x_min + i*offset;
+		float t = t_min + i*spacing;
 		output.push_back(fn.evaluate(t));
-		std::cout << "---" << std::endl;
 	}
-	/*
-	for(float t = x_min; t <= x_max; t += offset){
-		output.push_back(fn.evaluate(t));
-		std::cout << "---" << std::endl;
-	}*/
 	return output;
+}
+
+vector<float> convolve(vector<float> fn1_eval, vector<float> fn2_eval, float t_min, float t_max, int num_points){
+    //fn1 is stationary, fn2 is flipped and shifted
+    //t_shift = how far to shift left
+    float t_shift = max(-t_min, -t_max) - min(t_min, t_max);
+
+    for(unsigned int i = 0; i < 2*num_points; i++){
+        
+    }
+    std::cout << t_shift;
+    return vector<float>();
 }

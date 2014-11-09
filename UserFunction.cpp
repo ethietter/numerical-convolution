@@ -157,6 +157,9 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 bool UserFunction::process(){
 	std::vector<Token> tokens = tokenize(input_string);
 	s_yard = shuntingYard(tokens);
+	/*for(unsigned int i = 0; i < s_yard.size(); i++){
+		std::cout << s_yard[i].getStr() << " ";
+	}*/
 	return true;
 }
 
@@ -171,16 +174,13 @@ std::string UserFunction::getString(){
 float UserFunction::evaluate(float t){
 	std::stack<Token> eval_stack;
 	for(unsigned int i = 0; i < s_yard.size(); i++){
-		std::cout << s_yard[i].getStr() << " ";
 		if(s_yard[i].isVar()){
 			Token token;
 			token.setFloat(t);
 			eval_stack.push(token);
-			std::cout << token.getStr();
 		}
 		else if(s_yard[i].isNumber()){
 			eval_stack.push(s_yard[i]);
-			std::cout << s_yard[i].getStr();
 		}
 		else if(s_yard[i].isOperator()){
 			float op_right = eval_stack.top().getFloatVal();
@@ -188,15 +188,12 @@ float UserFunction::evaluate(float t){
 			float op_left = eval_stack.top().getFloatVal();
 			eval_stack.pop();
 			eval_stack.push(evalOp(op_left, op_right, s_yard[i]));
-			std::cout << s_yard[i].getStr();
 		}
 		else if(s_yard[i].isFunction()){
 			float op = eval_stack.top().getFloatVal();
 			eval_stack.pop();
 			eval_stack.push(evalFn(op, s_yard[i]));
-			std::cout << s_yard[i].getStr();
 		}
-		std::cout << " " << std::endl;
 	}
 	
 	if(eval_stack.size() != 1){
@@ -212,6 +209,7 @@ Token UserFunction::evalOp(float op_left, float op_right, Token op){
 	else if(op.getStr() == "*") token.setFloat(op_left * op_right);
 	else if(op.getStr() == "/") token.setFloat(op_left / op_right);
 	else if(op.getStr() == "^") token.setFloat(pow(op_left, op_right));
+	//std::cout << op_left << " " << op.getStr() << " " << op_right << std::endl;
 	return token;
 }
 

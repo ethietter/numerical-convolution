@@ -172,21 +172,12 @@ void Token::reset(){
 }
 
 float Token::getFloatVal(){
-	if(!is_partial){
-		if(float_val_set){
-			return float_val;
-		}
-		else{
-			try {
-				float_val = boost::lexical_cast<float>(token_string);
-				float_val_set = true;
-				return float_val;
-			}
-			catch(boost::bad_lexical_cast){
-				return 0;
-			}
-		}
-	}
+    try {
+        return boost::lexical_cast<float>(token_string);
+    }
+    catch(boost::bad_lexical_cast){
+        return 0;
+    }
 	return 0;
 }
 
