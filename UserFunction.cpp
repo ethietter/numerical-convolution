@@ -26,6 +26,7 @@ void UserFunction::init(){
 	valid_functions.push_back("sin");
 	valid_functions.push_back("tan");
 	valid_functions.push_back("ln");
+    valid_functions.push_back("exp");
 }
 
 std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
@@ -222,5 +223,6 @@ Token UserFunction::evalFn(float op, Token fn){
 	else if(fn.getStr() == "asin") token.setFloat(asin(op));
 	else if(fn.getStr() == "atan") token.setFloat(atan(op));
 	else if(fn.getStr() == "ln") token.setFloat(log(op));
+    else if(fn.getStr() == "exp") token.setFloat(exp(op));
 	return token;
 }
