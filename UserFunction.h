@@ -22,12 +22,14 @@ class UserFunction{
 		
 
     public:
-        UserFunction(std::string input);
+        UserFunction(std::string input, float t_min, float t_max);
         UserFunction();
         bool process();
         void setString(std::string input);
         std::string getString();
 		float evaluate(float t);
+        float t_min;
+        float t_max;
 
 };
 

@@ -1,4 +1,4 @@
-CXX = g++ -Wall -Werror -std=c++0x
+CXX = g++ -Wall -std=c++0x
 BIN = ../bin
 DIR = ~/lib/boost_1_56_0
 CFLAGS = -g

@@ -9,7 +9,11 @@
 #include <algorithm>
 
 
-UserFunction::UserFunction(std::string input) : input_string(input){
+UserFunction::UserFunction(std::string input, float t_min, float t_max) :
+input_string(input),
+t_min(t_min),
+t_max(t_max)
+{
 	init();
 }
 
@@ -27,6 +31,7 @@ void UserFunction::init(){
 	valid_functions.push_back("tan");
 	valid_functions.push_back("ln");
     valid_functions.push_back("exp");
+    valid_functions.push_back("abs");
 }
 
 std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
@@ -173,6 +178,9 @@ std::string UserFunction::getString(){
 }
 
 float UserFunction::evaluate(float t){
+    if(t < t_min || t > t_max){
+        return 0;
+    }
 	std::stack<Token> eval_stack;
 	for(unsigned int i = 0; i < s_yard.size(); i++){
 		if(s_yard[i].isVar()){
@@ -224,5 +232,6 @@ Token UserFunction::evalFn(float op, Token fn){
 	else if(fn.getStr() == "atan") token.setFloat(atan(op));
 	else if(fn.getStr() == "ln") token.setFloat(log(op));
     else if(fn.getStr() == "exp") token.setFloat(exp(op));
+    else if(fn.getStr() == "abs") token.setFloat(abs(op));
 	return token;
 }
