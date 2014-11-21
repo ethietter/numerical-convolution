@@ -101,6 +101,19 @@ std::vector<Token> UserFunction::shuntingYard(std::vector<Token> tokens){
 
 std::vector<Token> UserFunction::tokenize(std::string input){
 	unsigned int index = 0;
+    
+    if(input[0] == '-' || input[0] == '+'){
+        input.insert(0, "0");
+    }
+    for(unsigned int i = 1; i < input.size(); i++){
+        if(input[i - 1] == '('){
+            if(input[i] == '-' || input[i] == '+'){
+                input.insert(i, "0");
+            }
+        }
+    }
+    std::cout << input << std::endl;
+        
 	
 	std::vector<Token> tokens;
 	std::vector<std::string> functions;
@@ -194,8 +207,23 @@ float UserFunction::evaluate(float t){
 		else if(s_yard[i].isOperator()){
 			float op_right = eval_stack.top().getFloatVal();
 			eval_stack.pop();
-			float op_left = eval_stack.top().getFloatVal();
-			eval_stack.pop();
+            float op_left = eval_stack.top().getFloatVal();
+            eval_stack.pop();
+            //This does not work
+            /*
+            if(eval_stack.size() == 0 || (!eval_stack.top().isNumber() && !eval_stack.top().isVar())){
+                if(s_yard[i].getStr() == "-" || s_yard[i].getStr() == "+"){
+                    op_left = 0;
+                }
+                else{
+                    std::cout << "Error in evaluate 1" << std::endl;
+                }
+            }
+            else{
+			    op_left = eval_stack.top().getFloatVal();
+			    eval_stack.pop();
+            }*/
+            
 			eval_stack.push(evalOp(op_left, op_right, s_yard[i]));
 		}
 		else if(s_yard[i].isFunction()){
