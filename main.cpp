@@ -39,7 +39,7 @@ int main(int argc, char* argv[]){
             {"t2max", required_argument, 0, 'd'},
             {"datapoints", required_argument, 0, 'p'},
             {"fourier", required_argument, 0, 'r'},
-            {"help", no_argument, &help_flag, 'h'}
+            {"help", no_argument, &help_flag, 'h'},
         };
         int option_index = 0;
         c = getopt_long (argc, argv, "f:g:i:e:p:h", long_options, &option_index);
@@ -97,8 +97,10 @@ int main(int argc, char* argv[]){
     fixZeros(fn_convolve);
     
     cout << "clf;\nhold on;" << endl;
-
-    writeFourier(fn_convolve, num_coefficients, num_points);
+    
+    if(num_coefficients > 0){
+        writeFourier(fn_convolve, num_coefficients, num_points);
+    }
 
     matlabPrint(fn_convolve, "k");
     matlabPrint(evaluateFunction(fn1, t1_min, t1_max, num_points), "r");
