@@ -16,12 +16,14 @@ enum token_ids{
 
 Token::Token(std::string str) : token_string(str) {
 	is_partial = true;
+	float_val_set = false;
 	token_type = ID_UNDEFINED;
 	setType();
 }
 
 Token::Token(){
 	is_partial = true;
+	float_val_set = false;
 	token_type = ID_UNDEFINED;
 }
 
