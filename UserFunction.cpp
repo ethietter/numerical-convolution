@@ -117,7 +117,6 @@ std::vector<Token> UserFunction::tokenize(std::string input){
             }
         }
     }
-    //std::cout << input << std::endl;
         
 	
 	std::vector<Token> tokens;
@@ -128,7 +127,7 @@ std::vector<Token> UserFunction::tokenize(std::string input){
 	//Find the functions in input string
 	//When a function is found, replace it with '@' and then push the function on to the functions vector
 	for(unsigned int i = 0; i < valid_functions.size(); i++){
-		unsigned int pos = input.find(valid_functions[i], 0);
+		int pos = input.find(valid_functions[i], 0);
 		while(pos != std::string::npos){
 			input.replace(pos, valid_functions[i].size(), "@");
 			functions.push_back(valid_functions[i]);

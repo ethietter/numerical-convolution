@@ -10,7 +10,7 @@ class Token{
 		float float_val;
 		int token_type;
 		unsigned int precedence;
-		bool float_val_set = false;
+		bool float_val_set;
 		bool is_left_assoc;
 		bool is_partial;
 		void setType();

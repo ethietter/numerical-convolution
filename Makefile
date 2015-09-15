@@ -8,7 +8,7 @@ compile: main.o Token.o UserFunction.o
 
 test: 
 	make compile	
-	$(BIN)/convolution.exe
+	$(BIN)/convolution.exe --fn1 "1" --t1min 0 --t1max 1 --fn2 "-t + 1" --t2min 0 --t2max 1 --datapoints 200 --fourier 0 > ./plot.txt
 
 main.o: main.cpp
 	$(CXX) $(CFLAGS) -I $(DIR) -c main.cpp -o $(BIN)/main.o
